@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 import uuid
-from urlparse import urlparse
+from urlparse import urlparse, urljoin
 from django.core.urlresolvers import reverse, resolve
 from django.conf import settings
 
@@ -48,13 +48,10 @@ def validate_webhook(secret):
 def install_webhook():
     paymill = Pymill(settings.PAYMILL_PRIVATE_KEY)
     secret = uuid.uuid4().hex
-    url = '%s%s' % (settings.PAYMILL_WEBHOOK_HOST,
-                    reverse('paymill-webhook', args=[secret, ]))
 
-    url_obj = urlparse(url)
-    print(url_obj.geturl())
+    url = urljoin(settings.PAYMILL_WEBHOOK_HOST, reverse('paymill-webhook', args=[secret, ]))
 
-    paymill.new_webhook(url_obj.geturl(), WEBHOOK_EVENTS)
+    paymill.new_webhook(url, WEBHOOK_EVENTS)
     return secret
 
 
